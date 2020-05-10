@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {withRouter, Link} from 'react-router-dom';
+import {withRouter} from 'react-router-dom';
 import {Form, Input} from 'reactstrap';
 import {Button} from "reactstrap";
 // import './search-box.styles.css';
@@ -12,18 +12,29 @@ class SimpleSearchBox extends Component {
         };
     }
 
+    componentDidMount() {
+        localStorage.setItem('dateSince', '');
+        localStorage.setItem('queryText', '');
+        localStorage.setItem('dateTo', '');
+        localStorage.setItem('embedding', 'OFF');
+        localStorage.setItem('authors', []);
+        localStorage.setItem('curPage', 0);
+        localStorage.setItem('totalPage', -1);
+    }
+
     handleChange = (event) => {
         this.setState({text: event.target.value});
     }
 
     handleSubmit = (event) => {
         event.preventDefault();
+        localStorage.setItem('queryText', this.state.text);
+
         this
             .props
             .history
             .push({
                 pathname: '/query',
-                search: '?text=' + this.state.text
             });
     }
 

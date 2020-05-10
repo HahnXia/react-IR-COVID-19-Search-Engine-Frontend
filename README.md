@@ -1,3 +1,21 @@
+**Run npm install first.**
+
+
+
+
+
+
+
+
+
+
+
+
+
+### The following contents are from create react app readme
+
+
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts

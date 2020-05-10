@@ -1,9 +1,10 @@
 import React from 'react';
-import {Container, Pagination, PaginationItem, PaginationLink} from 'reactstrap';
+import {Pagination, PaginationItem, PaginationLink} from 'reactstrap';
 
 const PageNav = ({curPage, totalPage, handleNav}) => {
     curPage = curPage + 1;
     const pageNumbers = [];
+    if(totalPage <= 0) return <div></div>;
     if (totalPage <= 9) {
         for (let i = 1; i <= totalPage; i++) {
             pageNumbers.push(i);
@@ -24,7 +25,7 @@ const PageNav = ({curPage, totalPage, handleNav}) => {
             }
         }
     }
-    console.log(totalPage);
+    console.log('total: ' +totalPage + 'cur: ' + curPage);
 
     const items = [];
     pageNumbers.map(pagenum => {
@@ -38,7 +39,7 @@ const PageNav = ({curPage, totalPage, handleNav}) => {
             );
         } else {
             items.push(
-                <PaginationItem key={pagenum}>
+                <PaginationItem key={pagenum} className="active">
                     <PaginationLink href="#pablo" onClick={e => handleNav(e, pagenum - 1)}>
                         {pagenum}
                         <span className="sr-only">(current)</span>
@@ -48,7 +49,9 @@ const PageNav = ({curPage, totalPage, handleNav}) => {
         }
     });
 
+
     return (
+        
         <nav aria-label="...">
             <Pagination>
                 <PaginationItem>

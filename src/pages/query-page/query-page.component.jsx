@@ -5,47 +5,90 @@ import DocSnapshot from '../../components/doc/doc-snapshot/doc-snapshot.componen
 import PageNav from '../../components/page-nav/page-nav.component';
 import AdvancedSearchBox from '../../components/search-box/advanced-search-box/advanced-search-box.component';
 import {Container} from 'reactstrap';
+import Qs from 'qs';
+import DateParser from '../../utils/date-parser.utils'
 
 const SEVER_URL = 'http://localhost:8090';
-const QUERY_URL = 'query'
+const QUERY_URL = 'query';
+const NORMAL_QUERY = 'query';
+const EMBEDDING_QUERY = 'vector';
 
 class QueryPage extends Component {
 
     constructor(props) {
         super(props);
+        this.embedding = 'OFF';
         this.state = {
             curPage: 0,
             totalPage: -1,
             queryText: '',
-            author: '',
+            authors: '',
             dateSince: '',
             dateTo: '',
-            embedding: false,
+            embedding: 'OFF',
             content: []
         }
     }
 
     // only called from the mainpage
     componentDidMount() {
-        // the origin pass param from the 'location.search' field starts with '?', get
-        // rid of it
-        const text = this
-            .props
-            .location
-            .search
-            .substring(6);
-
-        axios
-            .get(`${SEVER_URL}/${QUERY_URL}/text`, {
-            params: {
-                text: text,
-                page: this.state.curPage
+        this.setState({
+            curPage: localStorage.hasOwnProperty('curPage')
+                ? localStorage.getItem('curPage')
+                : 0,
+            totalPage: localStorage.hasOwnProperty('totalPage')
+                ? localStorage.getItem('totalPage')
+                : -1,
+            queryText: localStorage.hasOwnProperty('queryText')
+                ? localStorage.getItem('queryText')
+                : '',
+            authors: localStorage.hasOwnProperty('authors')
+                ? localStorage.getItem('authors')
+                : [],
+            dateSince: localStorage.hasOwnProperty('dateSince')
+                ? localStorage.getItem('dateSince')
+                : '',
+            dateTo: localStorage.hasOwnProperty('dateTo')
+                ? localStorage.getItem('dateTo')
+                : '',
+            embedding: localStorage.hasOwnProperty('embedding')
+                ? localStorage.getItem('embedding')
+                : 'OFF'
+        }, () => {
+            this.embedding = this.state.embedding;
+            if (this.state.embedding === 'ON') {
+                axios
+                    .get(`${SEVER_URL}/${QUERY_URL}/${EMBEDDING_QUERY}`, {
+                    params: {
+                        query: this.state.queryText
+                    }
+                })
+                    .then(response => response.data)
+                    .then(response => {
+                        this.setState({content: response, totalPage: -1});
+                    });
+            } else {
+                console.log('curPage after refresh:' + this.state.curPage);
+                axios.get(`${SEVER_URL}/${QUERY_URL}/${NORMAL_QUERY}`, {
+                    params: {
+                        text: this.state.queryText,
+                        authors: this.state.authors,
+                        dateSince: this.state.dateSince,
+                        dateTo: this.state.dateTo,
+                        page: this.state.curPage
+                    },
+                    paramsSerializer: function (params) {
+                        return Qs.stringify(params, {arrayFormat: 'repeat'})
+                    }
+                })
+                    .then(response => response.data)
+                    .then(response => {
+                        this.setState({content: response.content, totalPage: response.totalPages});
+                    })
             }
-        })
-            .then(response => response.data)
-            .then(response => {
-                this.setState({queryText: text, content: response.content, totalPage: response.totalPages});
-            });
+
+        });
+
     }
 
     localStore = () => {
@@ -53,38 +96,38 @@ class QueryPage extends Component {
         localStorage.setItem('queryText', this.state.queryText);
         localStorage.setItem('dateTo', this.state.dateTo);
         localStorage.setItem('embedding', this.state.embedding);
-        localStorage.setItem('author', this.state.author);
-        console.log(localStorage.getItem('queryText'));
+        localStorage.setItem('authors', this.state.authors);
+        localStorage.setItem('curPage', this.state.curPage);
     }
 
     handleDateSinceChange = (date) => {
+        date = DateParser.parseDate(date._d.toISOString());
         this.setState({
-            dateSince: date._d
+            dateSince: date
         }, () => {
             console.log(this.state.dateSince);
         });
-
     }
+
     handleDateToChange = (date) => {
+        date = DateParser.parseDate(date._d.toISOString());
         this.setState({
-            dateTo: date._d
+            dateTo: date
         }, () => {
             console.log(this.state.dateTo);
-
         });
     }
 
     handleEmbeddingChange = (event) => {
-
         this.setState({
-            embedding: !this.state.embedding
+            embedding: event.target.value
         }, () => {
-            console.log(this.state.embedding);
-
-        })
+            // this.embedding = this.state.embedding;
+            console.log('embedding: ' + this.state.embedding)
+        });
     }
 
-    handelTextChange = (event) => {
+    handleTextChange = (event) => {
         const {value, name} = event.target;
         this.setState({
             [name]: value
@@ -94,34 +137,57 @@ class QueryPage extends Component {
         });
     }
 
+    handleAuthorsChange = (event) => {
+        const authors = event
+            .target
+            .value
+            .split(',');
+        const authorsList = [];
+        authors.map(author => authorsList.push(author));
+        this.setState({authors: authorsList});
+
+    }
+
     handleSubmit = (event) => {
         event.preventDefault();
         this.localStore();
-        axios
-            .get(`${SEVER_URL}/${QUERY_URL}/text`, {
-            params: {
-                text: this.state.queryText,
-                author: this.state.author,
-                dateSince: this.state.dateSince,
-                dateTo: this.state.dateTo,
-                embedding: this.state.embedding,
-                page: this.state.curPage
-            }
-        })
-            .then(response => response.data)
-            .then(response => this.setState({
-                content: response.content,
-                totalPage: response.totalPages,
-                queryText: localStorage.getItem('queryText'),
-                author: localStorage.getItem('author'),
-                dateSince: localStorage.getItem('dateSince'),
-                dateTo: localStorage.getItem('dateTo'),
-                curPage: 0,
-                embedding: localStorage.getItem('embedding')
-            }));
+        if (this.state.embedding === 'ON') {
+            this.embedding = 'ON';
+            axios
+                .get(`${SEVER_URL}/${QUERY_URL}/${EMBEDDING_QUERY}`, {
+                params: {
+                    query: this.state.queryText
+                }
+            })
+                .then(response => response.data)
+                .then(response => {
+                    this.setState({content: response, totalPage: -1});
+                })
+                .then(() => console.log(this.state.content));
+        } else {
+            this.embedding = 'OFF';
+            axios.get(`${SEVER_URL}/${QUERY_URL}/${NORMAL_QUERY}`, {
+                params: {
+                    text: this.state.queryText,
+                    authors: this.state.authors,
+                    dateSince: this.state.dateSince,
+                    dateTo: this.state.dateTo,
+                    page: 0
+                },
+                paramsSerializer: function (params) {
+                    return Qs.stringify(params, {arrayFormat: 'repeat'})
+                }
+            })
+                .then(response => response.data)
+                .then(response => {
+                    this.setState({content: response.content, totalPage: response.totalPages});
+                })
+        }
+
     }
 
     handleNav = (event, pagenum) => {
+        console.log(pagenum);
         if (pagenum === -1) {
             pagenum = this.state.curPage - 1;
         } else if (pagenum === -2) {
@@ -129,30 +195,41 @@ class QueryPage extends Component {
         }
         if (pagenum < 0 || pagenum > this.state.totalPage) 
             return;
-        event.preventDefault();
         console.log(pagenum);
-        this.localStore();
-        this.setState({
-            curPage: pagenum
-        }, () => axios.get(`${SEVER_URL}/${QUERY_URL}/text`, {
-            params: {
-                text: this.state.queryText,
-                author: this.state.author,
-                dateSince: this.state.dateSince,
-                dateTo: this.state.dateTo,
-                embedding: this.state.embedding,
-                page: this.state.curPage
-            }
-        }).then(response => response.data).then(response => this.setState({
-            content: response.content,
-            totalPage: response.totalPages,
-            queryText: localStorage.getItem('queryText'),
-            author: localStorage.getItem('author'),
-            dateSince: localStorage.getItem('dateSince'),
-            dateTo: localStorage.getItem('dateTo'),
-            curPage: pagenum,
-            embedding: localStorage.getItem('embedding')
-        })));
+        if (this.state.embedding === 'ON') {
+            this.embedding = 'ON';
+            axios
+                .get(`${SEVER_URL}/${QUERY_URL}/${EMBEDDING_QUERY}`, {
+                params: {
+                    query: this.state.queryText
+                }
+            })
+                .then(response => response.data)
+                .then(response => {
+                    this.setState({content: response, totalPage: -1, curPage: pagenum});
+                })
+                .then(() => console.log(this.state.content));
+        } else {
+            this.embedding = 'OFF';
+            axios.get(`${SEVER_URL}/${QUERY_URL}/${NORMAL_QUERY}`, {
+                params: {
+                    text: this.state.queryText,
+                    authors: this.state.authors,
+                    dateSince: this.state.dateSince,
+                    dateTo: this.state.dateTo,
+                    page: pagenum
+                },
+                paramsSerializer: function (params) {
+                    return Qs.stringify(params, {arrayFormat: 'repeat'})
+                }
+            })
+                .then(response => response.data)
+                .then(response => {
+                    this.setState({content: response.content, totalPage: response.totalPages, curPage: pagenum});
+                })
+                .then(() => this.localStore());
+        }
+
     }
 
     handleRedirectDocInfo = (event, docID) => {
@@ -161,10 +238,16 @@ class QueryPage extends Component {
             .state
             .content
             .map((docInfo => {
-                if (docInfo.id === docID) 
-                    curDocInfo = docInfo
+                if (this.embedding === 'ON') {
+                    if (docInfo.sentence.id === docID) {
+                        curDocInfo = docInfo.covidMeta
+                    }
+                } else {
+                    if (docInfo.id === docID) 
+                        curDocInfo = docInfo
+                }
             }));
-        console.log(curDocInfo);
+
         localStorage.setItem('curDocInfo', JSON.stringify(curDocInfo));
         this
             .props
@@ -190,11 +273,12 @@ class QueryPage extends Component {
                 </div>
                 <div>
                     <AdvancedSearchBox
-                        handelTextChange={this.handelTextChange}
+                        handleTextChange={this.handleTextChange}
                         handlesubmit={this.handleSubmit}
                         handleDateSinceChange={this.handleDateSinceChange}
                         handleDateToChange={this.handleDateToChange}
                         handleEmbeddingChange={this.handleEmbeddingChange}
+                        handleAuthorsChange={this.handleAuthorsChange}
                         states={this.state}/>
                 </div>
                 <Container style={{
@@ -205,8 +289,11 @@ class QueryPage extends Component {
                         .state
                         .content
                         .map(docinfo => (<DocSnapshot
-                            key={docinfo.id}
+                            key={this.embedding === 'ON'
+                            ? docinfo.sentence.id
+                            : docinfo.id}
                             info={docinfo}
+                            embedding={this.embedding}
                             handleRedirectDocInfo={this.handleRedirectDocInfo}/>))
 }
                     <br/><br/>

@@ -1,6 +1,5 @@
 import React from 'react';
-import Switch from "react-bootstrap-switch";
-import ReactDatetime from "react-datetime";
+import Datetime from "react-datetime";
 import {
     Form,
     FormGroup,
@@ -18,7 +17,16 @@ const styles = {
     fontWeight: '100'
 }
 
-const AdvancedSearchBox = ({handelTextChange, handlesubmit, handleDateSinceChange, handleEmbeddingChange,handleDateToChange, states}) => (
+const AdvancedSearchBox = ({
+    handleAuthorsChange,
+    handleTextChange,
+    handlesubmit,
+    handleDateSinceChange,
+    handleEmbeddingChange,
+    handleDateToChange,
+    embedding,
+    states
+}) => (
 
     <div className="section">
         <Container>
@@ -36,7 +44,7 @@ const AdvancedSearchBox = ({handelTextChange, handlesubmit, handleDateSinceChang
                                     name='queryText'
                                     type="text"
                                     value={states.queryText}
-                                    onChange={handelTextChange}/>
+                                    onChange={handleTextChange}/>
                             </FormGroup>
                         </Col>
 
@@ -58,75 +66,86 @@ const AdvancedSearchBox = ({handelTextChange, handlesubmit, handleDateSinceChang
                 </div>
                 <div className='mt-2'>
                     <Row>
-                        <Col sm="3">
-                            <FormGroup>
-                                <Label for='author' id='bootstrap-overrides'>
-                                    Author
-                                </Label>
-                                <Input
-                                    id='author'
-                                    className='mr-1'
-                                    name='author'
-                                    type="text"
-                                    value={states.author}
-                                    onChange={handelTextChange}/>
-                            </FormGroup>
+                        <Col sm="3">{states.embedding === 'ON'
+                                ? <div></div>
+                                : <FormGroup>
+                                    <Label for='author' id='bootstrap-overrides'>
+                                        Author
+                                    </Label>
+                                    <Input
+                                        id='author'
+                                        className='mr-1'
+                                        name='author'
+                                        type="text"
+                                        value={states.authors}
+                                        onChange={handleAuthorsChange}/>
+                                </FormGroup>
+}
                         </Col>
-                        <Col sm="3">
-                            <FormGroup>
-                                <Label id='bootstrap-overrides'>
-                                    Date Since
-                                </Label>
-                                <InputGroup className="date" id="datetimepicker">
+                        <Col sm="3">{states.embedding === 'ON'
+                                ? <div></div>
+                                : <FormGroup>
+                                    <Label id='bootstrap-overrides'>
+                                        Date Since
+                                    </Label>
+                                    <InputGroup className="date" id="datetimepicker">
 
-                                    <ReactDatetime
-                                        onChange={handleDateSinceChange}
-                                        inputProps={{
-                                        placeholder: ""
-                                    }}/>
-                                    <InputGroupAddon addonType="append">
-                                        <InputGroupText>
-                                            <span className="glyphicon glyphicon-calendar">
-                                                <i aria-hidden={true} className="fa fa-calendar"/>
-                                            </span>
-                                        </InputGroupText>
-                                    </InputGroupAddon>
-                                </InputGroup>
-                            </FormGroup>
+                                        <Datetime
+                                            dateFormat="YYYY-MM-DD"
+                                            timeFormat={false}
+                                            onChange={handleDateSinceChange}
+                                            value={states.dateSince}
+                                            inputProps={{
+                                            placeholder: ""
+                                        }}/>
+                                        <InputGroupAddon addonType="append">
+                                            <InputGroupText>
+                                                <span className="glyphicon glyphicon-calendar">
+                                                    <i aria-hidden={true} className="fa fa-calendar"/>
+                                                </span>
+                                            </InputGroupText>
+                                        </InputGroupAddon>
+                                    </InputGroup>
+                                </FormGroup>
+}
+
                         </Col>
 
                         <Col sm="3">
-                            <FormGroup>
-                                <Label id='bootstrap-overrides'>
-                                    Date to
-                                </Label>
-                                <InputGroup className="date" id="datetimepicker">
-                                    <ReactDatetime
-                                        onChange={handleDateToChange}
-                                        inputProps={{
-                                        placeholder: ""
-                                    }}/>
-                                    <InputGroupAddon addonType="append">
-                                        <InputGroupText>
-                                            <span className="glyphicon glyphicon-calendar">
-                                                <i aria-hidden={true} className="fa fa-calendar"/>
-                                            </span>
-                                        </InputGroupText>
-                                    </InputGroupAddon>
-                                </InputGroup>
-                            </FormGroup>
+                            {states.embedding === 'ON'
+                                ? <div></div>
+                                : <FormGroup>
+                                    <Label id='bootstrap-overrides'>
+                                        Date to
+                                    </Label>
+                                    <InputGroup className="date" id="datetimepicker">
+                                        <Datetime
+                                            dateFormat="YYYY-MM-DD"
+                                            timeFormat={false}
+                                            onChange={handleDateToChange}
+                                            value={states.dateTo}
+                                            inputProps={{
+                                            placeholder: ""
+                                        }}/>
+                                        <InputGroupAddon addonType="append">
+                                            <InputGroupText>
+                                                <span className="glyphicon glyphicon-calendar">
+                                                    <i aria-hidden={true} className="fa fa-calendar"/>
+                                                </span>
+                                            </InputGroupText>
+                                        </InputGroupAddon>
+                                    </InputGroup>
+                                </FormGroup>
+}
                         </Col>
                         <Col sm="1"></Col>
                         <Col sm="auto">
                             <FormGroup>
-                                <div id="switches">
-                                    <Label for='sw' id='bootstrap-overrides'>
-                                        Embedding
-                                    </Label>
-                                    <div className='mt-1'>
-                                        <Switch id='sw' onChange={handleEmbeddingChange} defaultValue={false} onColor="primary" offColor="primary"/>
-                                    </div>
-                                </div>
+                                <Label for="inputState">Embedding Search</Label>
+                                <Input type="select" name="select" id="inputState" value={states.embedding} onChange={handleEmbeddingChange}>
+                                    <option>OFF</option>
+                                    <option>ON</option>
+                                </Input>
                             </FormGroup>
                         </Col>
                     </Row>

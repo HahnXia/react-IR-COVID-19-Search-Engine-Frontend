@@ -1,19 +1,7 @@
 import React, {Component} from 'react';
 import {withRouter} from 'react-router-dom';
-
-import DocInfo from '../../components/doc/doc-info/doc-info.component';
 import {Container} from 'reactstrap';
-import {
-    Form,
-    FormGroup,
-    InputGroupAddon,
-    InputGroupText,
-    InputGroup,
-    Label,
-    Input,
-    Col,
-    Row
-} from 'reactstrap';
+import {Col, Row} from 'reactstrap';
 
 class DocPage extends Component {
     constructor(props) {
@@ -31,6 +19,17 @@ class DocPage extends Component {
     }
 
     render() {
+        let authors = '';
+        if (this.state.content.authors !== null && this.state.content.authors !== undefined && this.state.content.authors.length > 0) {
+            authors = this.state.content.authors[0];
+            for (let i = 1; i < this.state.content.authors.length; i++) {
+                authors = authors + ', ' + this.state.content.authors[i];
+            }
+            authors = authors + '.';
+        } else {
+            authors = 'Unknown';
+        }
+
         return (
             <div>
                 <div
@@ -47,13 +46,14 @@ class DocPage extends Component {
                     </div>
                 </div>
                 <Container>
+                    <br></br>
                     <div className="mt-5">
                         <h3>{this.state.content.title}</h3>
                     </div>
                     <div className="mt-3">
                         <Row>
                             <Col sm='auto'>
-                                <p>Authors: {this.state.content.authors}</p>
+                                <p>Authors: {authors}</p>
                             </Col>
                             <Col sm='auto'>
                                 <p>Publish Time: {this.state.content.publishTime}</p>
@@ -64,7 +64,7 @@ class DocPage extends Component {
                         </Row>
                     </div>
                     <div className="mt-3">
-                        {this.state.content.bodyText !== undefined && this.state.content.bodyText.length > 0 && this
+                        {this.state.content.bodyText !== null && this.state.content.bodyText !== undefined && this.state.content.bodyText.length > 0 && this
                             .state
                             .content
                             .bodyText
@@ -74,7 +74,13 @@ class DocPage extends Component {
                                 </div>
                             ))}
                     </div>
-
+                    <br></br>
+                    <br></br>
+                    <br></br>
+                    <br></br>
+                    <br></br>
+                    <br></br>
+                    <br></br>
                 </Container>
 
             </div>
