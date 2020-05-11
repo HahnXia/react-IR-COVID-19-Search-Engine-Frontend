@@ -1,4 +1,5 @@
 import React from 'react';
+import {Link} from 'react-router-dom';
 import {Col, Row} from 'reactstrap';
 
 const DocSnapshot = (props) => {
@@ -40,7 +41,9 @@ const DocSnapshot = (props) => {
         ? <Col sm='auto'>
                 <p>Score: {docInfo.score}</p>
             </Col>
-        : <div></div>;
+        : <Col sm='auto'>
+            <p>Score: {props.info.sentence.score}</p>
+        </Col>;
 
     const url = docInfo.url !== undefined && docInfo.url.length > 0
         ? <Col sm='auto'>
@@ -50,9 +53,18 @@ const DocSnapshot = (props) => {
 
     return (
         <div>
+            <div className="mt-4">
+                <Link
+                    style={{
+                    color: '#403e3e',
+                    fontSize: 21
+                }}
+                    onClick={e => props.handleRedirectDocInfo(e, props.ID)}>{docInfo.title !== undefined && docInfo.title !== null && docInfo.title.length > 0
+                        ? docInfo.title
+                        : 'NO TITLE FOR THIS ARTICLE'}</Link>
+            </div>
 
-            <h3 className="mb-1" onClick={e => props.handleRedirectDocInfo(e, docInfo.id)}>{docInfo.title}</h3>
-            <Row>
+            <Row className="mt-1">
                 <Col sm='auto'>
                     <p>Authors: {authors}</p>
                 </Col>

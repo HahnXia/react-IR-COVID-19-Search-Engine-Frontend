@@ -151,6 +151,7 @@ class QueryPage extends Component {
     handleSubmit = (event) => {
         event.preventDefault();
         this.localStore();
+        localStorage.setItem('content', []);
         if (this.state.embedding === 'ON') {
             this.embedding = 'ON';
             axios
@@ -182,12 +183,12 @@ class QueryPage extends Component {
                 .then(response => {
                     this.setState({content: response.content, totalPage: response.totalPages});
                 })
+                .then(() => console.log(this.state.content));
         }
 
     }
 
     handleNav = (event, pagenum) => {
-        console.log(pagenum);
         if (pagenum === -1) {
             pagenum = this.state.curPage - 1;
         } else if (pagenum === -2) {
@@ -229,7 +230,6 @@ class QueryPage extends Component {
                 })
                 .then(() => this.localStore());
         }
-
     }
 
     handleRedirectDocInfo = (event, docID) => {
@@ -237,16 +237,16 @@ class QueryPage extends Component {
         this
             .state
             .content
-            .map((docInfo => {
+            .map((docInfo, index) => {
                 if (this.embedding === 'ON') {
-                    if (docInfo.sentence.id === docID) {
+                    if (index === docID) {
                         curDocInfo = docInfo.covidMeta
                     }
                 } else {
-                    if (docInfo.id === docID) 
+                    if (index === docID) 
                         curDocInfo = docInfo
                 }
-            }));
+            });
 
         localStorage.setItem('curDocInfo', JSON.stringify(curDocInfo));
         this
@@ -256,6 +256,7 @@ class QueryPage extends Component {
     }
 
     render() {
+
         return (
             <div>
                 <div
@@ -282,16 +283,15 @@ class QueryPage extends Component {
                         states={this.state}/>
                 </div>
                 <Container style={{
-                    marginTop: '-25px'
+                    marginTop: '0 px'
                 }}>
 
                     {this
                         .state
                         .content
-                        .map(docinfo => (<DocSnapshot
-                            key={this.embedding === 'ON'
-                            ? docinfo.sentence.id
-                            : docinfo.id}
+                        .map((docinfo, index) => (<DocSnapshot
+                            key={index}
+                            ID={index}
                             info={docinfo}
                             embedding={this.embedding}
                             handleRedirectDocInfo={this.handleRedirectDocInfo}/>))

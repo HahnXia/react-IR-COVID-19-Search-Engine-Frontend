@@ -13,10 +13,6 @@ import {
 } from 'reactstrap';
 import {Button, Container} from "reactstrap";
 
-const styles = {
-    fontWeight: '100'
-}
-
 const AdvancedSearchBox = ({
     handleAuthorsChange,
     handleTextChange,

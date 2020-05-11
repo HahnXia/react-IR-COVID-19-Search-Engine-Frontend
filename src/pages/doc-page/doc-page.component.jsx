@@ -48,7 +48,9 @@ class DocPage extends Component {
                 <Container>
                     <br></br>
                     <div className="mt-5">
-                        <h3>{this.state.content.title}</h3>
+                        <h3>{this.state.content.title !== undefined && this.state.content.title !== null && this.state.content.title.length > 0
+                                ? this.state.content.title
+                                : 'NO TITLE FOR THIS ARTICLE'}</h3>
                     </div>
                     <div className="mt-3">
                         <Row>
@@ -63,13 +65,16 @@ class DocPage extends Component {
                             </Col>
                         </Row>
                     </div>
+                    <div>
+                        {this.state.content.textAbstract !== undefined && this.state.content.textAbstract.length > 0 && <p>Abstract: {this.state.content.textAbstract}</p>}
+                    </div>
                     <div className="mt-3">
                         {this.state.content.bodyText !== null && this.state.content.bodyText !== undefined && this.state.content.bodyText.length > 0 && this
                             .state
                             .content
                             .bodyText
-                            .map(para => (
-                                <div className='mt-1'>
+                            .map((para, index) => (
+                                <div key={index} className='mt-1'>
                                     <p>{para}</p>
                                 </div>
                             ))}
