@@ -17,6 +17,8 @@
       }
     }
 }
+
+
 .modal-dialog{
     &.modal-sm,
     &.modal-register{
@@ -42,10 +44,12 @@
 .modal-dialog {
     padding-top: 60px;
 }
+
 .modal-body{
     padding: 20px 50px;
     color: #000;
 }
+
 .modal-footer {
     border-top: 1px solid $medium-gray;
     padding: 0px;

@@ -7,6 +7,7 @@ import AdvancedSearchBox from '../../components/search-box/advanced-search-box/a
 import {Container} from 'reactstrap';
 import Qs from 'qs';
 import DateParser from '../../utils/date-parser.utils'
+import TrendModal from '../../components/modal/trend-modal.component';
 
 const SEVER_URL = 'http://localhost:8090';
 const QUERY_URL = 'query';
@@ -282,26 +283,27 @@ class QueryPage extends Component {
                         handleAuthorsChange={this.handleAuthorsChange}
                         states={this.state}/>
                 </div>
-                <Container style={{
-                    marginTop: '0 px'
-                }}>
-
-                    {this
-                        .state
-                        .content
-                        .map((docinfo, index) => (<DocSnapshot
-                            key={index}
-                            ID={index}
-                            info={docinfo}
-                            embedding={this.embedding}
-                            handleRedirectDocInfo={this.handleRedirectDocInfo}/>))
+                <div>
+                    <Container >
+                        {this.embedding === 'ON' && <TrendModal title={this.state.queryText}/> }
+                        
+                        {this
+                            .state
+                            .content
+                            .map((docinfo, index) => (<DocSnapshot
+                                key={index}
+                                ID={index}
+                                info={docinfo}
+                                embedding={this.embedding}
+                                handleRedirectDocInfo={this.handleRedirectDocInfo}/>))
 }
-                    <br/><br/>
-                    <PageNav
-                        totalPage={this.state.totalPage}
-                        curPage={this.state.curPage}
-                        handleNav={this.handleNav}/>
-                </Container>
+                        <br/><br/>
+                        <PageNav
+                            totalPage={this.state.totalPage}
+                            curPage={this.state.curPage}
+                            handleNav={this.handleNav}/>
+                    </Container>
+                </div>
 
             </div>
         );
