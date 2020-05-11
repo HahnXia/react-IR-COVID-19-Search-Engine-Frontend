@@ -4,6 +4,9 @@ import {Form, Input} from 'reactstrap';
 import {Button} from "reactstrap";
 // import './search-box.styles.css';
 
+/**
+ * The search bar for the index page. It will automatically call the text query for the input and redirect to the query page
+ */
 class SimpleSearchBox extends Component {
     constructor(props) {
         super(props);
@@ -12,6 +15,7 @@ class SimpleSearchBox extends Component {
         };
     }
 
+    // Using localStorage to store the value for cross page value Initial all iterms
     componentDidMount() {
         localStorage.setItem('dateSince', '');
         localStorage.setItem('queryText', '');
@@ -22,10 +26,12 @@ class SimpleSearchBox extends Component {
         localStorage.setItem('totalPage', -1);
     }
 
+    // update the text state while inputing
     handleChange = (event) => {
         this.setState({text: event.target.value});
     }
 
+    // redirected to the query page
     handleSubmit = (event) => {
         event.preventDefault();
         localStorage.setItem('queryText', this.state.text);
@@ -33,9 +39,7 @@ class SimpleSearchBox extends Component {
         this
             .props
             .history
-            .push({
-                pathname: '/query',
-            });
+            .push({pathname: '/query'});
     }
 
     render() {

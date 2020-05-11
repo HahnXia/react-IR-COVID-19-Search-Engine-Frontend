@@ -3,6 +3,9 @@ import {withRouter} from 'react-router-dom';
 import {Container} from 'reactstrap';
 import {Col, Row} from 'reactstrap';
 
+/**
+ * The doc page shows the detailed doc infomation 
+ */
 class DocPage extends Component {
     constructor(props) {
         super(props);
@@ -11,6 +14,7 @@ class DocPage extends Component {
         }
     }
 
+    // fetch and parse the doc info from the localStorage which is set inside the query page
     componentDidMount() {
         console.log(JSON.parse(localStorage.getItem('curDocInfo')));
         this.setState({

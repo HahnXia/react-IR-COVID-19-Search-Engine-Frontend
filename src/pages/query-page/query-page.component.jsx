@@ -1,23 +1,27 @@
 import React, {Component} from 'react';
+import {Container} from 'reactstrap';
 import axios from 'axios';
+import Qs from 'qs';
 import {withRouter} from 'react-router-dom';
 import DocSnapshot from '../../components/doc/doc-snapshot/doc-snapshot.component';
 import PageNav from '../../components/page-nav/page-nav.component';
 import AdvancedSearchBox from '../../components/search-box/advanced-search-box/advanced-search-box.component';
-import {Container} from 'reactstrap';
-import Qs from 'qs';
 import DateParser from '../../utils/date-parser.utils'
 import TrendModal from '../../components/modal/trend-modal.component';
+import * as Constants from '../../constant/application-properties';
 
-const SEVER_URL = 'http://localhost:8090';
-const QUERY_URL = 'query';
-const NORMAL_QUERY = 'query';
-const EMBEDDING_QUERY = 'vector';
-
+/**
+ * Query page component. Contains avdvanced searchbox and query results.
+ */
 class QueryPage extends Component {
 
     constructor(props) {
         super(props);
+        // The embedding variable is set deliberately here, not a duplicated val as the
+        // state.embedding. Since the React is stateful, the component will be refreshed
+        // every time a relative state is updated. And the embedding results has
+        // different parsing method with the non-embedding results. We use the stateless
+        // embedding to determine the parse method
         this.embedding = 'OFF';
         this.state = {
             curPage: 0,
@@ -31,8 +35,9 @@ class QueryPage extends Component {
         }
     }
 
-    // only called from the mainpage
+    // Call when refreshing or first redirected to this page.
     componentDidMount() {
+        // Restore the state using cache
         this.setState({
             curPage: localStorage.hasOwnProperty('curPage')
                 ? localStorage.getItem('curPage')
@@ -57,9 +62,10 @@ class QueryPage extends Component {
                 : 'OFF'
         }, () => {
             this.embedding = this.state.embedding;
+            // send request to the backend in embedding mode
             if (this.state.embedding === 'ON') {
                 axios
-                    .get(`${SEVER_URL}/${QUERY_URL}/${EMBEDDING_QUERY}`, {
+                    .get(`${Constants.SEVER_URL}/${Constants.QUERY_URL}/${Constants.EMBEDDING_QUERY}`, {
                     params: {
                         query: this.state.queryText
                     }
@@ -68,9 +74,10 @@ class QueryPage extends Component {
                     .then(response => {
                         this.setState({content: response, totalPage: -1});
                     });
+            // send request to the backend in normal mode
             } else {
                 console.log('curPage after refresh:' + this.state.curPage);
-                axios.get(`${SEVER_URL}/${QUERY_URL}/${NORMAL_QUERY}`, {
+                axios.get(`${Constants.SEVER_URL}/${Constants.QUERY_URL}/${Constants.NORMAL_QUERY}`, {
                     params: {
                         text: this.state.queryText,
                         authors: this.state.authors,
@@ -92,6 +99,7 @@ class QueryPage extends Component {
 
     }
 
+    // function to cache current state
     localStore = () => {
         localStorage.setItem('dateSince', this.state.dateSince);
         localStorage.setItem('queryText', this.state.queryText);
@@ -101,6 +109,7 @@ class QueryPage extends Component {
         localStorage.setItem('curPage', this.state.curPage);
     }
 
+    // handle user datesince input
     handleDateSinceChange = (date) => {
         date = DateParser.parseDate(date._d.toISOString());
         this.setState({
@@ -110,6 +119,7 @@ class QueryPage extends Component {
         });
     }
 
+    // handle user dateto input
     handleDateToChange = (date) => {
         date = DateParser.parseDate(date._d.toISOString());
         this.setState({
@@ -119,25 +129,26 @@ class QueryPage extends Component {
         });
     }
 
+    // handle user search mode input
     handleEmbeddingChange = (event) => {
         this.setState({
             embedding: event.target.value
         }, () => {
-            // this.embedding = this.state.embedding;
             console.log('embedding: ' + this.state.embedding)
         });
     }
 
+    // handle the text query input 
     handleTextChange = (event) => {
         const {value, name} = event.target;
         this.setState({
             [name]: value
         }, () => {
             console.log(name + ':' + value);
-
         });
     }
 
+    // handle the authors input, split them by ','
     handleAuthorsChange = (event) => {
         const authors = event
             .target
@@ -146,17 +157,18 @@ class QueryPage extends Component {
         const authorsList = [];
         authors.map(author => authorsList.push(author));
         this.setState({authors: authorsList});
-
     }
 
+    // submit the query 
     handleSubmit = (event) => {
+        // prevent refresh page, only forcus on content state change
         event.preventDefault();
+        // store the current user query into cache
         this.localStore();
-        localStorage.setItem('content', []);
         if (this.state.embedding === 'ON') {
             this.embedding = 'ON';
             axios
-                .get(`${SEVER_URL}/${QUERY_URL}/${EMBEDDING_QUERY}`, {
+                .get(`${Constants.SEVER_URL}/${Constants.QUERY_URL}/${Constants.EMBEDDING_QUERY}`, {
                 params: {
                     query: this.state.queryText
                 }
@@ -168,7 +180,7 @@ class QueryPage extends Component {
                 .then(() => console.log(this.state.content));
         } else {
             this.embedding = 'OFF';
-            axios.get(`${SEVER_URL}/${QUERY_URL}/${NORMAL_QUERY}`, {
+            axios.get(`${Constants.SEVER_URL}/${Constants.QUERY_URL}/${Constants.NORMAL_QUERY}`, {
                 params: {
                     text: this.state.queryText,
                     authors: this.state.authors,
@@ -189,6 +201,7 @@ class QueryPage extends Component {
 
     }
 
+    // every time user page navigate, it will call the backend to fetch the res in a certain page
     handleNav = (event, pagenum) => {
         if (pagenum === -1) {
             pagenum = this.state.curPage - 1;
@@ -197,11 +210,11 @@ class QueryPage extends Component {
         }
         if (pagenum < 0 || pagenum > this.state.totalPage) 
             return;
-        console.log(pagenum);
+
         if (this.state.embedding === 'ON') {
             this.embedding = 'ON';
             axios
-                .get(`${SEVER_URL}/${QUERY_URL}/${EMBEDDING_QUERY}`, {
+                .get(`${Constants.SEVER_URL}/${Constants.QUERY_URL}/${Constants.EMBEDDING_QUERY}`, {
                 params: {
                     query: this.state.queryText
                 }
@@ -213,7 +226,7 @@ class QueryPage extends Component {
                 .then(() => console.log(this.state.content));
         } else {
             this.embedding = 'OFF';
-            axios.get(`${SEVER_URL}/${QUERY_URL}/${NORMAL_QUERY}`, {
+            axios.get(`${Constants.SEVER_URL}/${Constants.QUERY_URL}/${Constants.NORMAL_QUERY}`, {
                 params: {
                     text: this.state.queryText,
                     authors: this.state.authors,
@@ -233,6 +246,8 @@ class QueryPage extends Component {
         }
     }
 
+    // when user click the result snapshoot title, it will loop through the current results to find the target
+    // doc content, then store the content into localStorage which will be fetched on the doc detailed info page.
     handleRedirectDocInfo = (event, docID) => {
         var curDocInfo = '';
         this
@@ -257,7 +272,6 @@ class QueryPage extends Component {
     }
 
     render() {
-
         return (
             <div>
                 <div
@@ -285,8 +299,8 @@ class QueryPage extends Component {
                 </div>
                 <div>
                     <Container >
-                        {this.embedding === 'ON' && <TrendModal title={this.state.queryText}/> }
-                        
+                        {this.embedding === 'ON' && <TrendModal title={this.state.queryText}/>}
+
                         {this
                             .state
                             .content

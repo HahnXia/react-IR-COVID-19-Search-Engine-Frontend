@@ -1,16 +1,23 @@
 import React from 'react';
 import {Pagination, PaginationItem, PaginationLink} from 'reactstrap';
 
+/**
+ * The page navigation component appearing at the bottom of the page in NON-Embedding mode.
+ * @param {*} param0 
+ */
 const PageNav = ({curPage, totalPage, handleNav}) => {
+    // since the index starts from 0, for navigation, the first page is '1', so we plus 1 here.
     curPage = curPage + 1;
     const pageNumbers = [];
+
+    // The following code is responsible for dynamic page number in the nav bar.
+    // if the total page number is '-1' which is the initial number, return empty
     if(totalPage <= 0) return <div></div>;
     if (totalPage <= 9) {
         for (let i = 1; i <= totalPage; i++) {
             pageNumbers.push(i);
         }
     } else {
-        // page1 disappear
         if (curPage <= 5) {
             for (let i = 1; i <= 9; i++) {
                 pageNumbers.push(i);
@@ -25,8 +32,8 @@ const PageNav = ({curPage, totalPage, handleNav}) => {
             }
         }
     }
-    console.log('total: ' +totalPage + 'cur: ' + curPage);
 
+    // generate nav component for each page
     const items = [];
     pageNumbers.map(pagenum => {
         if (pagenum !== curPage) {

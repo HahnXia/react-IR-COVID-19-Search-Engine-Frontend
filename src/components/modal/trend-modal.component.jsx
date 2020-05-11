@@ -1,7 +1,11 @@
 import React from "react";
-// reactstrap components
 import {Button, Modal} from "reactstrap";
 
+/**
+ * The TrendModal component is for showing the trend image for the query trend analysis in the embedding mode
+ * NOTICE: The img src part can be diffferent among various results
+ * @param {*} props 
+ */
 function TrendModal(props) {
     const [liveDemo,
         setLiveDemo] = React.useState(false);

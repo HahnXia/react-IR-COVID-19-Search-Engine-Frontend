@@ -13,6 +13,10 @@ import {
 } from 'reactstrap';
 import {Button, Container} from "reactstrap";
 
+/**
+ * The Advanced search box component
+ * @param {*} param0 
+ */
 const AdvancedSearchBox = ({
     handleAuthorsChange,
     handleTextChange,
@@ -20,7 +24,6 @@ const AdvancedSearchBox = ({
     handleDateSinceChange,
     handleEmbeddingChange,
     handleDateToChange,
-    embedding,
     states
 }) => (
 
@@ -138,7 +141,12 @@ const AdvancedSearchBox = ({
                         <Col sm="auto">
                             <FormGroup>
                                 <Label for="inputState">Embedding Search</Label>
-                                <Input type="select" name="select" id="inputState" value={states.embedding} onChange={handleEmbeddingChange}>
+                                <Input
+                                    type="select"
+                                    name="select"
+                                    id="inputState"
+                                    value={states.embedding}
+                                    onChange={handleEmbeddingChange}>
                                     <option>OFF</option>
                                     <option>ON</option>
                                 </Input>

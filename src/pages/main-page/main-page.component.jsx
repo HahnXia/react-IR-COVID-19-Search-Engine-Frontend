@@ -3,8 +3,10 @@ import {Container} from "reactstrap";
 
 import SimpleSearchBox from '../../components/search-box/simple-search-box/simple-search-box.component';
 
+/**
+ * The main/index page
+ */
 function MainPage() {
-    // eslint-disable-next-line no-useless-constructor
 
     let pageHeader = React.createRef();
 

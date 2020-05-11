@@ -2,13 +2,19 @@ import React from 'react';
 import {Link} from 'react-router-dom';
 import {Col, Row} from 'reactstrap';
 
+/**
+ * This component is used in the query-page to list all of the search result.
+ * @param {*} props
+ */
 const DocSnapshot = (props) => {
-    // console.log('here: '); console.log(props.info);
+    // Since the embedding result and normal search result have different json
+    // format, we prefetch the doc infomation into the docInfo wariable based on the
+    // search mode
     const docInfo = props.embedding === 'ON'
         ? props.info.covidMeta
         : props.info;
-    // console.log(docInfo);
 
+    // Show the authors or Unknown
     let authors = '';
     if (docInfo.authors !== undefined && docInfo.authors !== null && docInfo.authors !== undefined && docInfo.authors.length > 0) {
         authors = docInfo.authors[0];
@@ -24,6 +30,7 @@ const DocSnapshot = (props) => {
         authors = 'Unknown';
     }
 
+    // Show part of Abstract or Body text if the abstract is missing
     const snapshootText = props.embedding === 'ON'
         ? <p>Paragraph: {props.info.sentence.text}</p>
         : docInfo.textAbstract !== undefined && docInfo.textAbstract !== null && docInfo.textAbstract.length > 0 && docInfo.textAbstract[0].length > 0
@@ -37,6 +44,8 @@ const DocSnapshot = (props) => {
                             .substring(0, 800)}</p>
                 : <p>No text</p>);
 
+    // Show score for a certain search result, since the serch results json format
+    // are not the same, we need handle it here in different ways
     const score = props.embedding === 'OFF'
         ? <Col sm='auto'>
                 <p>Score: {docInfo.score}</p>
@@ -45,6 +54,7 @@ const DocSnapshot = (props) => {
             <p>Score: {props.info.sentence.score}</p>
         </Col>;
 
+    // Show the original text link
     const url = docInfo.url !== undefined && docInfo.url.length > 0
         ? <Col sm='auto'>
                 <a href={docInfo.url}>view original text</a>
