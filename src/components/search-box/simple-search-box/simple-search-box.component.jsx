@@ -46,7 +46,7 @@ class SimpleSearchBox extends Component {
         return (
             <div>
                 <br/>
-                <Form onSubmit={this.handleSubmit}>
+                <Form>
                     <Input
                         type="text"
                         value={this.state.title}
@@ -58,13 +58,14 @@ class SimpleSearchBox extends Component {
                         color="neutral"
                         type="submit"
                         value="Submit"
+                        onClick={this.handleSubmit}
                         outline>Submit</Button>
                     <Button
-                        href='/query'
                         className="btn-round"
                         color="neutral"
                         type="button"
                         value="Submit"
+                        onClick={this.handleSubmit}
                         outline>
                         Advanced Search</Button>
                 </Form>
