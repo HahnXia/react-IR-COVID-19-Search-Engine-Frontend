@@ -56,7 +56,7 @@
     "react-bootstrap": "^1.0.1",
     "react-bootstrap-switch": "^15.5.3",
     "react-datetime": "^2.16.3",
-    "react-dev-utils": "^10.2.1",
+    "react-dev-utils": "^11.0.4",
     "react-dom": "^16.13.1",
     "react-router-dom": "^5.1.2",
     "reactstrap": "^8.4.1",
